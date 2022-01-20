@@ -13,7 +13,7 @@ namespace Azure.ScheduledEvents
         private readonly Timer _t = new Timer(TimeSpan.FromSeconds(2).TotalMilliseconds);
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly ScheduledEventsClient _client;
-        private readonly TimeSpan _noticePeriod = TimeSpan.FromSeconds(30);
+        private readonly TimeSpan _noticePeriod = TimeSpan.FromMinutes(1);
 
         public ScheduledEventsCancellationTokenSource(TimeSpan noticePeriod, ScheduledEventsClient client = null)
         {

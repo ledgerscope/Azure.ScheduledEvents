@@ -28,7 +28,7 @@ namespace Azure.ScheduledEvents
             this.scheduledEventsEndpoint = scheduledEventsEndpoint;
         }
 
-        public ScheduledEventsClient() : this(new Uri("http://169.254.169.254/metadata/scheduledevents?api-version=2019-01-01"))
+        public ScheduledEventsClient() : this(new Uri("http://169.254.169.254/metadata/scheduledevents?api-version=2020-07-01"))
         {
 
         }

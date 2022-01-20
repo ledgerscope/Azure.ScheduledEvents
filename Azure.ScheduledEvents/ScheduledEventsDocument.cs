@@ -34,12 +34,16 @@ namespace Azure.ScheduledEvents
 
     /// <summary>
     /// Represents an individual scheduled event
+    /// See https://docs.microsoft.com/en-us/azure/virtual-machines/windows/scheduled-events for descriptions
     /// </summary>
     [DataContract]
     public class ScheduledEvent
     {
         [DataMember]
         public string EventId { get; set; }
+
+        [DataMember]
+        public string EventSource { get; set; }
 
         [DataMember]
         public string EventStatus { get; set; }
@@ -55,5 +59,11 @@ namespace Azure.ScheduledEvents
 
         [DataMember]
         public DateTime? NotBefore { get; set; }
+
+        [DataMember]
+        public int DurationInSeconds { get; set; }
+
+        [DataMember]
+        public string Description { get; set; }
     }
 }
