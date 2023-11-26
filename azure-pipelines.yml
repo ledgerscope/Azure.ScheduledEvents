@@ -9,35 +9,35 @@ trigger:
 - master
 
 pool:
-  vmImage: 'windows-latest'
+  vmImage: 'ubuntu-latest'
 
 steps:
-- task: NuGetToolInstaller@1
-  inputs:
-    versionSpec: 
-    checkLatest: true
-
-- task: NuGetCommand@2
+- task: DotNetCoreCLI@2
+  displayName: 'Dotnet Restore'
   inputs:
     command: 'restore'
-    restoreSolution: '**/*.sln'
-    feedsToUse: 'select'
+    projects: '**/*.sln'
 
-- task: VSBuild@1
+- task: DotNetCoreCLI@2
+  displayName: 'Dotnet Build'
   inputs:
-    solution: '**\*.sln'
-    maximumCpuCount: true
+    command: 'build'
+    projects: '**/*.sln'
+    arguments: '--no-restore'
 
-- task: NuGetCommand@2
+- task: DotNetCoreCLI@2
+  displayName: 'Dotnet Pack'
   inputs:
     command: 'pack'
-    packagesToPack: '**/*.csproj'
+    projects: '**/*.sln'
     versioningScheme: 'byBuildNumber'
-    includeSymbols: true
- 
-- task: NuGetCommand@2
+    arguments: '--no-restore --no-build'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Dotnet Publish'
   inputs:
     command: 'push'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/*.nupkg'
     nuGetFeedType: 'internal'
     publishVstsFeed: 'aeaa4311-673f-4791-a14d-d19ad82f0603'
+    arguments: '--no-restore --no-build'

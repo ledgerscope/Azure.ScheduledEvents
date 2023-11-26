@@ -13,24 +13,24 @@
 #
 */
 
-using Newtonsoft.Json;
 using System;
-using System.Net;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Threading.Tasks;
 
 namespace Azure.ScheduledEvents
 {
     public class ScheduledEventsClient
     {
-        private readonly Uri scheduledEventsEndpoint;
+        private readonly SourceGenerationContext sourceGenerationContext;
 
-        public ScheduledEventsClient(Uri scheduledEventsEndpoint)
+        private readonly IHttpClientFactory httpClientFactory;
+        private readonly Uri scheduledEventsEndpoint = new Uri("http://169.254.169.254/metadata/scheduledevents?api-version=2020-07-01");
+
+        public ScheduledEventsClient(IHttpClientFactory httpClientFactory, SourceGenerationContext sourceGenerationContext)
         {
-            this.scheduledEventsEndpoint = scheduledEventsEndpoint;
-        }
-
-        public ScheduledEventsClient() : this(new Uri("http://169.254.169.254/metadata/scheduledevents?api-version=2020-07-01"))
-        {
-
+            this.httpClientFactory = httpClientFactory;
+            this.sourceGenerationContext = sourceGenerationContext;
         }
 
         /// <summary>
@@ -41,17 +41,13 @@ namespace Azure.ScheduledEvents
         ///
         /// </summary>
         /// <returns>The Scheduled Events document</returns>
-        public ScheduledEventsDocument GetScheduledEvents()
+        public async Task<ScheduledEventsDocument> GetScheduledEvents()
         {
-            using (var webClient = new WebClient())
-            {
-                webClient.Headers.Add("Metadata", "true");
-                var json = webClient.DownloadString(scheduledEventsEndpoint);
+            using var webClient = httpClientFactory.CreateClient();
+            webClient.DefaultRequestHeaders.Add("Metadata", "true");
 
-                var scheduledEventsDocument = JsonConvert.DeserializeObject<ScheduledEventsDocument>(json);
-
-                return scheduledEventsDocument;
-            }
+            var scheduledEventsDocument = await webClient.GetFromJsonAsync(scheduledEventsEndpoint, sourceGenerationContext.ScheduledEventsDocument);
+            return scheduledEventsDocument;
         }
 
         /// <summary>
@@ -61,13 +57,12 @@ namespace Azure.ScheduledEvents
         /// Please see here: "https://docs.microsoft.com/en-us/azure/virtual-machines/virtual-machines-scheduled-events"
         /// </summary>
         /// <param name="jsonPost">Json string with events to be approved</param>
-        public void ExpediteScheduledEvents(string jsonPost)
+        public async Task ExpediteScheduledEvents(string jsonPost)
         {
-            using (var webClient = new WebClient())
-            {
-                webClient.Headers.Add("Content-Type", "application/json");
-                webClient.UploadString(scheduledEventsEndpoint, jsonPost);
-            }
+            using var webClient = httpClientFactory.CreateClient();
+
+            webClient.DefaultRequestHeaders.Add("Content-Type", "application/json");
+            await webClient.PostAsync(scheduledEventsEndpoint, new StringContent(jsonPost));
         }
     }
 }

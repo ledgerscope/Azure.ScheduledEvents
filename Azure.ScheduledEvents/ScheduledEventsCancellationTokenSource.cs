@@ -13,12 +13,11 @@ namespace Azure.ScheduledEvents
         private readonly Timer _t = new Timer(TimeSpan.FromSeconds(2).TotalMilliseconds);
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly ScheduledEventsClient _client;
-        private readonly TimeSpan _noticePeriod = TimeSpan.FromMinutes(1);
+        private readonly TimeSpan _noticePeriod = TimeSpan.FromMinutes(5);
 
-        public ScheduledEventsCancellationTokenSource(TimeSpan noticePeriod, ScheduledEventsClient client = null)
+        public ScheduledEventsCancellationTokenSource(ScheduledEventsClient client)
         {
-            _noticePeriod = noticePeriod;
-            _client = client ?? new ScheduledEventsClient();
+            _client = client;
 
             _t.Elapsed += t_Elapsed;
             _t.Start();
@@ -29,19 +28,24 @@ namespace Azure.ScheduledEvents
             return _cancellationTokenSource.Token;
         }
 
-        private void t_Elapsed(object sender, ElapsedEventArgs e)
+        private async void t_Elapsed(object sender, ElapsedEventArgs e)
         {
             try
             {
-                var document = _client.GetScheduledEvents();
+                _t.Stop();
 
-                foreach (var item in document.Events)
+                var document = await _client.GetScheduledEvents();
+
+                if (document != null)
                 {
-                    if (item.NotBefore.HasValue)
+                    foreach (var item in document.Events)
                     {
-                        if (item.NotBefore.Value.Add(_noticePeriod) < DateTime.UtcNow)
+                        if (item.NotBefore.HasValue)
                         {
-                            _cancellationTokenSource.Cancel();
+                            if (item.NotBefore.Value.Add(_noticePeriod) < DateTime.UtcNow)
+                            {
+                                _cancellationTokenSource.Cancel();
+                            }
                         }
                     }
                 }
@@ -49,6 +53,13 @@ namespace Azure.ScheduledEvents
             catch (Exception ex)
             {
                 Debug.WriteLine(ex.ToString());
+            }
+            finally
+            {
+                if (!_cancellationTokenSource.IsCancellationRequested)
+                {
+                    _t.Start();
+                }
             }
         }
     }
