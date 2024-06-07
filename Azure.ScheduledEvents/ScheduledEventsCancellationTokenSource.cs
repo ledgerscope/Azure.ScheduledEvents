@@ -1,26 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
+using Microsoft.Extensions.Logging;
+
 using Timer = System.Timers.Timer;
 using ElapsedEventArgs = System.Timers.ElapsedEventArgs;
-using System.Diagnostics;
 
 namespace Azure.ScheduledEvents
 {
-    public class ScheduledEventsCancellationTokenSource// : IDisposable
+    public partial class ScheduledEventsCancellationTokenSource : IDisposable
     {
         private readonly Timer _t = new Timer(TimeSpan.FromSeconds(2).TotalMilliseconds);
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly ScheduledEventsClient _client;
+        private readonly ILogger<ScheduledEventsCancellationTokenSource> logger;
         private readonly TimeSpan _noticePeriod = TimeSpan.FromMinutes(5);
 
-        public ScheduledEventsCancellationTokenSource(ScheduledEventsClient client)
+        public ScheduledEventsCancellationTokenSource(ScheduledEventsClient client, ILogger<ScheduledEventsCancellationTokenSource> logger)
         {
             _client = client;
-
+            this.logger = logger;
             _t.Elapsed += t_Elapsed;
             _t.Start();
+        }
+
+        public void Dispose()
+        {
+            _t?.Dispose();
         }
 
         public CancellationToken GetCancellationToken()
@@ -36,7 +41,7 @@ namespace Azure.ScheduledEvents
 
                 var document = await _client.GetScheduledEvents();
 
-                if (document != null)
+                if (document?.Events != null)
                 {
                     foreach (var item in document.Events)
                     {
@@ -52,7 +57,7 @@ namespace Azure.ScheduledEvents
             }
             catch (Exception ex)
             {
-                Debug.WriteLine(ex.ToString());
+                LogErrorRetrievingScheduledEvents(ex);
             }
             finally
             {
@@ -62,5 +67,8 @@ namespace Azure.ScheduledEvents
                 }
             }
         }
+
+        [LoggerMessage(Level = LogLevel.Error, Message = "Error retrieving ScheduledEvents")]
+        public partial void LogErrorRetrievingScheduledEvents(Exception ex);
     }
 }

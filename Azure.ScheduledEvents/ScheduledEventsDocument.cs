@@ -29,7 +29,7 @@ namespace Azure.ScheduledEvents
         public string DocumentIncarnation;
 
         [DataMember]
-        public List<ScheduledEvent> Events { get; set; }
+        public ScheduledEvent[] Events { get; set; }
     }
 
     /// <summary>
