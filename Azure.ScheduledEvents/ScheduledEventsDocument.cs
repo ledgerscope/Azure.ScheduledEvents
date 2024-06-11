@@ -14,7 +14,6 @@
 */
 
 using System;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace Azure.ScheduledEvents
@@ -55,7 +54,7 @@ namespace Azure.ScheduledEvents
         public string ResourceType { get; set; }
 
         [DataMember]
-        public List<string> Resources { get; set; }
+        public string[] Resources { get; set; }
 
         [DataMember]
         public DateTime? NotBefore { get; set; }
