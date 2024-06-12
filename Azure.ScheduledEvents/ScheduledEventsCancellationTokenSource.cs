@@ -1,16 +1,15 @@
 ﻿using System;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-
-using Timer = System.Timers.Timer;
-using ElapsedEventArgs = System.Timers.ElapsedEventArgs;
 
 namespace Azure.ScheduledEvents
 {
     public partial class ScheduledEventsCancellationTokenSource : IDisposable
     {
-        private readonly Timer _t = new Timer(TimeSpan.FromSeconds(2).TotalMilliseconds);
+        private readonly Task _t;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private readonly CancellationTokenSource _externalCancellationTokenSource = new CancellationTokenSource();
         private readonly ScheduledEventsClient _client;
         private readonly ILogger<ScheduledEventsCancellationTokenSource> logger;
         private readonly TimeSpan _noticePeriod = TimeSpan.FromMinutes(5);
@@ -19,13 +18,13 @@ namespace Azure.ScheduledEvents
         {
             _client = client;
             this.logger = logger;
-            _t.Elapsed += t_Elapsed;
-            _t.Start();
+            _t = Timer();
         }
 
         public void Dispose()
         {
-            _t?.Dispose();
+            _externalCancellationTokenSource.Cancel();
+            _cancellationTokenSource.Dispose();
         }
 
         public CancellationToken GetCancellationToken()
@@ -33,37 +32,34 @@ namespace Azure.ScheduledEvents
             return _cancellationTokenSource.Token;
         }
 
-        private async void t_Elapsed(object sender, ElapsedEventArgs e)
+        private async Task Timer()
         {
-            try
+            using var pt = new PeriodicTimer(TimeSpan.FromSeconds(10));
+            using var tokens = CancellationTokenSource.CreateLinkedTokenSource(_externalCancellationTokenSource.Token, _cancellationTokenSource.Token);
+
+            while (await pt.WaitForNextTickAsync(tokens.Token))
             {
-                _t.Stop();
-
-                var document = await _client.GetScheduledEvents();
-
-                if (document?.Events != null)
+                try
                 {
-                    foreach (var item in document.Events)
+                    var document = await _client.GetScheduledEvents();
+
+                    if (document?.Events != null)
                     {
-                        if (item.NotBefore.HasValue)
+                        foreach (var item in document.Events)
                         {
-                            if (item.NotBefore.Value.Add(_noticePeriod) < DateTime.UtcNow)
+                            if (item.NotBefore.HasValue)
                             {
-                                _cancellationTokenSource.Cancel();
+                                if (item.NotBefore.Value.Add(_noticePeriod) < DateTime.UtcNow)
+                                {
+                                    _cancellationTokenSource.Cancel();
+                                }
                             }
                         }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                LogErrorRetrievingScheduledEvents(ex);
-            }
-            finally
-            {
-                if (!_cancellationTokenSource.IsCancellationRequested)
+                catch (Exception ex)
                 {
-                    _t.Start();
+                    LogErrorRetrievingScheduledEvents(ex);
                 }
             }
         }
