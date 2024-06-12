@@ -14,20 +14,17 @@
 */
 
 using System;
-using System.Runtime.Serialization;
+using System.Text.Json.Serialization;
 
 namespace Azure.ScheduledEvents
 {
     /// <summary>
     /// Represents the entire Scheduled Events document
     /// </summary>
-    [DataContract]
     public class ScheduledEventsDocument
     {
-        [DataMember]
-        public string DocumentIncarnation;
+        public int DocumentIncarnation;
 
-        [DataMember]
         public ScheduledEvent[] Events { get; set; }
     }
 
@@ -35,34 +32,25 @@ namespace Azure.ScheduledEvents
     /// Represents an individual scheduled event
     /// See https://docs.microsoft.com/en-us/azure/virtual-machines/windows/scheduled-events for descriptions
     /// </summary>
-    [DataContract]
     public class ScheduledEvent
     {
-        [DataMember]
         public string EventId { get; set; }
 
-        [DataMember]
         public string EventSource { get; set; }
 
-        [DataMember]
         public string EventStatus { get; set; }
 
-        [DataMember]
         public string EventType { get; set; }
 
-        [DataMember]
         public string ResourceType { get; set; }
 
-        [DataMember]
         public string[] Resources { get; set; }
 
-        [DataMember]
+        [JsonConverter(typeof(DateTimeConverterForCustomStandardFormatR))]
         public DateTime? NotBefore { get; set; }
 
-        [DataMember]
         public int DurationInSeconds { get; set; }
 
-        [DataMember]
         public string Description { get; set; }
     }
 }
