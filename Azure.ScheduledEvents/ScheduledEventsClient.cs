@@ -48,7 +48,13 @@ namespace Azure.ScheduledEvents
             webClient.Timeout = TimeSpan.FromMinutes(5); //First request reckons it can take 2 minutes
             webClient.DefaultRequestHeaders.Add("Metadata", "true");
 
-            var scheduledEventsDocument = await webClient.GetFromJsonAsync(scheduledEventsEndpoint, sourceGenerationContext.ScheduledEventsDocument);
+            using var response = await webClient.GetAsync(scheduledEventsEndpoint);
+
+            response.EnsureSuccessStatusCode();
+            
+            using var content = response.Content;
+         
+            var scheduledEventsDocument = await content.ReadFromJsonAsync(sourceGenerationContext.ScheduledEventsDocument);
             return scheduledEventsDocument;
         }
 
