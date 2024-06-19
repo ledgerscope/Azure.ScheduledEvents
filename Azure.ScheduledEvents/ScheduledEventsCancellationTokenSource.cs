@@ -60,6 +60,7 @@ namespace Azure.ScheduledEvents
                 catch (Exception ex)
                 {
                     LogErrorRetrievingScheduledEvents(ex);
+                    await Task.Delay(TimeSpan.FromSeconds(Random.Shared.Next(10, 20)));
                 }
             }
         }
