@@ -41,7 +41,7 @@ namespace Azure.ScheduledEvents
         ///
         /// </summary>
         /// <returns>The Scheduled Events document</returns>
-        public async Task<ScheduledEventsDocument> GetScheduledEvents()
+        public async Task<ScheduledEventsDocument?> GetScheduledEvents()
         {
             using var webClient = httpClientFactory.CreateClient();
 
@@ -53,6 +53,11 @@ namespace Azure.ScheduledEvents
             response.EnsureSuccessStatusCode();
             
             using var content = response.Content;
+
+            if (response.Content.Headers.ContentLength == 0)
+            {
+                return null;
+            }
          
             var scheduledEventsDocument = await content.ReadFromJsonAsync(sourceGenerationContext.ScheduledEventsDocument);
             return scheduledEventsDocument;
