@@ -1,9 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30011.22
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35004.147
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azure.ScheduledEvents", "Azure.ScheduledEvents\Azure.ScheduledEvents.csproj", "{9439CB35-132E-4B0A-B6B7-E29A6CD09C53}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Azure.ScheduledEvents", "Azure.ScheduledEvents\Azure.ScheduledEvents.csproj", "{9439CB35-132E-4B0A-B6B7-E29A6CD09C53}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Azure.ScheduledEvents.Tests", "Azure.ScheduledEvents.Tests\Azure.ScheduledEvents.Tests.csproj", "{3DEE5D13-D907-43F5-AEF5-1C79C4C74EDD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{9439CB35-132E-4B0A-B6B7-E29A6CD09C53}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9439CB35-132E-4B0A-B6B7-E29A6CD09C53}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9439CB35-132E-4B0A-B6B7-E29A6CD09C53}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DEE5D13-D907-43F5-AEF5-1C79C4C74EDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DEE5D13-D907-43F5-AEF5-1C79C4C74EDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DEE5D13-D907-43F5-AEF5-1C79C4C74EDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DEE5D13-D907-43F5-AEF5-1C79C4C74EDD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
