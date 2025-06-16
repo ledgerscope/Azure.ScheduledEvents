@@ -34,6 +34,7 @@ namespace Azure.ScheduledEvents
         private static readonly TimeSpan LockCheckInterval = TimeSpan.FromSeconds(30);
         private static readonly TimeSpan HttpPollInterval = TimeSpan.FromSeconds(10);
         private static readonly TimeSpan CacheExpiry = TimeSpan.FromSeconds(30);
+        private static readonly TimeSpan HttpTimeout = TimeSpan.FromSeconds(30); // Reduced from 5 minutes for better test experience
         
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly SourceGenerationContext _sourceGenerationContext;
@@ -153,7 +154,7 @@ namespace Azure.ScheduledEvents
         private async Task<ScheduledEventsDocument?> GetScheduledEventsDirectly()
         {
             using var webClient = _httpClientFactory.CreateClient();
-            webClient.Timeout = TimeSpan.FromMinutes(5);
+            webClient.Timeout = HttpTimeout; // Use configurable timeout instead of 5 minutes
             webClient.DefaultRequestHeaders.Add("Metadata", "true");
 
             using var response = await webClient.GetAsync(_scheduledEventsEndpoint);
