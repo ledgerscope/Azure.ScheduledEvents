@@ -12,6 +12,10 @@ pool:
   vmImage: 'ubuntu-latest'
 
 steps:
+- task: UseDotNet@2
+  inputs:
+    version: '10.x'
+
 - task: DotNetCoreCLI@2
   displayName: 'Dotnet Restore'
   inputs:
