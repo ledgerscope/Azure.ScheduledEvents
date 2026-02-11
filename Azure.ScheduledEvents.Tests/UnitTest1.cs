@@ -11,17 +11,22 @@ namespace Azure.ScheduledEvents.Tests
         [TestMethod]
         public async Task TestMethod1()
         {
-            var httpClientFactory = new ServiceCollection().AddHttpClient().BuildServiceProvider().GetRequiredService<IHttpClientFactory>();
-            var client = new ScheduledEventsClient(httpClientFactory, new SourceGenerationContext());
-
+            var services = new ServiceCollection()
+                .AddScheduledEventsClient()
+                .BuildServiceProvider();
+            
+            var client = services.GetRequiredService<ScheduledEventsClient>();
             var doc = await client.GetScheduledEvents();
         }
 
         [TestMethod]
         public async Task TestMethod2()
         {
-            var httpClientFactory = new ServiceCollection().AddHttpClient().BuildServiceProvider().GetRequiredService<IHttpClientFactory>();
-            ScheduledEventsClient client = new ScheduledEventsClient(httpClientFactory, new SourceGenerationContext());
+            var services = new ServiceCollection()
+                .AddScheduledEventsClient()
+                .BuildServiceProvider();
+            
+            var client = services.GetRequiredService<ScheduledEventsClient>();
 
             using (var cts = new ScheduledEventsCancellationTokenSource(client, NullLogger<ScheduledEventsCancellationTokenSource>.Instance))
             {
