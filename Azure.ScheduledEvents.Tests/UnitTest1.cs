@@ -18,6 +18,7 @@ namespace Azure.ScheduledEvents.Tests
         }
 
         [TestMethod]
+        [Ignore("Test cancellation token source, will run indefinitely until cancelled")]
         public async Task TestMethod2()
         {
             var httpClientFactory = new ServiceCollection().AddHttpClient().BuildServiceProvider().GetRequiredService<IHttpClientFactory>();
