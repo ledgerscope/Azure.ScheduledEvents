@@ -11,7 +11,7 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     
     permissions:
       contents: read
@@ -35,7 +35,7 @@ jobs:
 
   package:
     needs: build-and-test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     
     permissions:
       contents: read
@@ -65,7 +65,7 @@ jobs:
 
   publish:
     needs: package
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04-arm
     # Only publish on pushes to master branch (not on pull requests)
     if: github.event_name == 'push' && github.ref == 'refs/heads/master'
     
