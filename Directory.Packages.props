@@ -7,6 +7,6 @@
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
     <PackageVersion Include="Microsoft.Extensions.Http" Version="10.0.12" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
-    <PackageVersion Include="MSTest" Version="4.3.3" />
+    <PackageVersion Include="MSTest" Version="4.4.0" />
   </ItemGroup>
 </Project>
